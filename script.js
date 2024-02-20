@@ -49,6 +49,41 @@ const deleteButtonHandler = () => {
   }
 };
 
+const excuteButtonHandler = () => {
+  if (currentNumber && storedNumber && operation) {
+    switch (operation) {
+      case "+":
+        storedNumber = parseFloat(storedNumber) + parseFloat(currentNumber);
+        break;
+      case "-":
+        storedNumber = parseFloat(storedNumber) - parseFloat(currentNumber);
+        break;
+      case "/":
+        storedNumber = parseFloat(storedNumber) / parseFloat(currentNumber);
+        break;
+      case "*":
+        storedNumber = parseFloat(storedNumber) * parseFloat(currentNumber);
+        break;
+    }
+    currentNumber = "";
+    updateScreen(storedNumber);
+  }
+};
+
+const operationHandler = (operationValue) => {
+  if (!currentNumber && !storedNumber) return;
+  if (currentNumber && !storedNumber) {
+    storedNumber = currentNumber;
+    currentNumber = "";
+    operation = operationValue;
+  } else if (storedNumber) {
+    // debugger;
+
+    if (currentNumber) excuteButtonHandler();
+    operation = operationValue;
+  }
+};
+
 const keyElementHandler = (Element) => {
   Element.addEventListener("click", () => {
     const { type } = Element.dataset;
@@ -62,6 +97,11 @@ const keyElementHandler = (Element) => {
         case "Backspace":
           deleteButtonHandler();
           break;
+        case "Enter":
+          excuteButtonHandler();
+          break;
+        default:
+          operationHandler(Element.dataset.value);
       }
     }
   });
