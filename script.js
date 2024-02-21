@@ -1,34 +1,31 @@
-// Light/Dark theme
-const themeElement = document.querySelector(".themes__toggle");
+// Light/Dark Theme
+const themeBotton = document.querySelector(".themes__toggle");
 
-const toggleDarkTheme = () => {
-  themeElement.classList.toggle("themes__toggle--isActive");
+const darkThemeHandler = () => {
+  themeBotton.classList.toggle("themes__toggle--isActive");
+};
+const darkThemeAccessibility = (event) => {
+  if (event.key === "Enter") darkThemeHandler();
 };
 
-const DarkThemeAccissability = (event) => {
-  if (event.key === "Enter") {
-    toggleDarkTheme();
-  }
-};
+themeBotton.addEventListener("click", darkThemeHandler);
+themeBotton.addEventListener("keydown", darkThemeAccessibility);
 
-themeElement.addEventListener("click", toggleDarkTheme);
-themeElement.addEventListener("keydown", DarkThemeAccissability);
+// Calculator Logic
+const keyElements = document.querySelectorAll("[data-type]");
+const resultElement = document.querySelector(".calc__result");
 
-// Logic for calculator
 let storedNumber = "";
 let currentNumber = "";
 let operation = "";
-
-const resultElement = document.querySelector(".calc__result");
-const keyElements = document.querySelectorAll("[data-type]");
 
 const updateScreen = (value) => {
   resultElement.textContent = !value ? "0" : value;
 };
 
 const numberButtonHandler = (value) => {
-  if (value === "." && currentNumber.includes(".")) return;
   if (value === "0" && !currentNumber) return;
+  if (value === "." && currentNumber.includes(".")) return;
 
   currentNumber += value;
   updateScreen(currentNumber);
@@ -77,20 +74,20 @@ const operationHandler = (operationValue) => {
     currentNumber = "";
     operation = operationValue;
   } else if (storedNumber) {
-    // debugger;
-
     if (currentNumber) excuteButtonHandler();
     operation = operationValue;
   }
 };
 
-const keyElementHandler = (Element) => {
-  Element.addEventListener("click", () => {
-    const { type } = Element.dataset;
-    if (type === "number") {
-      numberButtonHandler(Element.dataset.value);
-    } else if (type === "operation") {
-      switch (Element.dataset.value) {
+const keyElementsHandler = (element) => {
+  element.addEventListener("click", () => {
+    const elementType = element.dataset.type;
+    const elementValue = element.dataset.value;
+
+    if (elementType === "number") {
+      numberButtonHandler(elementValue);
+    } else if (elementType === "operation") {
+      switch (elementValue) {
         case "c":
           resetButtonHandler();
           break;
@@ -101,10 +98,28 @@ const keyElementHandler = (Element) => {
           excuteButtonHandler();
           break;
         default:
-          operationHandler(Element.dataset.value);
+          operationHandler(elementValue);
       }
     }
   });
 };
 
-keyElements.forEach(keyElementHandler);
+keyElements.forEach(keyElementsHandler);
+
+// Accessibility
+const numbersArray = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
+const operationsArray = ["Backspace", "Enter", "c", "+", "-", "/", "*"];
+const elmentsArray = [...numbersArray, ...operationsArray];
+
+const keyboardWithHover = (key) => {
+  if (elmentsArray.includes(key)) {
+    const calculatorElement = document.querySelector(`[data-value="${key}"]`);
+    calculatorElement.classList.add("hover");
+    calculatorElement.click();
+    setTimeout(() => calculatorElement.classList.remove("hover"), 100);
+  }
+};
+
+window.addEventListener("keydown", (Event) => {
+  keyboardWithHover(Event.key);
+});
